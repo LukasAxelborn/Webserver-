@@ -12,7 +12,7 @@
 #define BUF_SIZE 4096     /* block transfer size */
 #define QUEUE_SIZE 10
 
-void fatal(char * string)
+void fatal(char *string)
 {
     printf("%s\n", string);
     exit(1);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
 
     /* bind and listen */
-    b = bind(s, (struct sockaddr*)&channel, sizeof(channel));
+    b = bind(s, (struct sockaddr *)&channel, sizeof(channel));
     if (b < 0)
         fatal("bind failed");
 
@@ -58,11 +58,12 @@ int main(int argc, char *argv[])
         /* meanwhile the socket is still listening */
         if (sa < 0)
             fatal("accept failed");
-        
-        write(sa, argv[1], strlen(argv[1]));
+
+        char buff[100];
+        snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
+        write(sa, (char *)buff, strlen((char *)buff));
 
         read(sa, buf, BUF_SIZE); //read file name from socket
-
 
         /* get and return the file */
         fd = open(buf, O_RDONLY); //open the file to be sent back
