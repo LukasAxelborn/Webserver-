@@ -38,9 +38,18 @@ char* parse_http_request(char* request){
     return ret;
 }
 
+unsigned long fsize(char* file)
+{
+    FILE * f = fopen(file, "r");
+    fseek(f, 0, SEEK_END);
+    unsigned long len = (unsigned long)ftell(f);
+    fclose(f);
+    return len;
+}
+
 int main(int argc, char *argv[])
 {
-    int s, b, l, sa, on = 1;
+    int s, b, l, fd, sa, bytes, on = 1;
     char buf[BUF_SIZE], tmp[BUF_SIZE];         /* buffer for outging file */
     struct sockaddr_in channel; /* holds IP address */
 
@@ -85,8 +94,23 @@ int main(int argc, char *argv[])
 
 
         // funktionen retunerar en sträng om addrese till filen den vill läsa      
-        parse_http_request(buf);
-        printf("\n\n\n\n\n %s \n\n\n\n\n", parse_http_request(buf));
+        char* filename = parse_http_request(buf);
+
+
+        /* get and return the file */
+        fd = open(filename, O_RDONLY); //open the file to be sent back
+        if (fd < 0)
+            fatal("open failed");
+
+        long filesize = fsize(filename);
+
+        while (1)
+        {
+            bytes = read(fd, filename, filesize); //read from file
+            if (bytes <= 0)
+                break;             //check for eof
+            write(sa, filename, filesize); //write bytes to socket
+        }
 
         char buff[100];
         snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
