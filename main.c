@@ -53,32 +53,17 @@ int main(int argc, char *argv[])
     {
         printf("wating for connection on port %d\n", SERVER_PORT);
         fflush(stdout);
+
         sa = accept(s, 0, 0); //block for connection request, last 2 arg is to get address of whoever connected
         /* sa will be used to interact with the connected client */
         /* meanwhile the socket is still listening */
         if (sa < 0)
             fatal("accept failed");
-
+        
         char buff[100];
         snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
         write(sa, (char *)buff, strlen((char *)buff));
 
-        read(sa, buf, BUF_SIZE); //read file name from socket
-
-        /* get and return the file */
-        fd = open(buf, O_RDONLY); //open the file to be sent back
-        printf("buf: %s\n", buf);
-        if (fd < 0)
-            fatal("open failed");
-
-        while (1)
-        {
-            bytes = read(fd, buf, BUF_SIZE); //read from file
-            if (bytes <= 0)
-                break;             //check for eof
-            write(sa, buf, bytes); //write bytes to socket
-        }
-        close(fd); //close file
         close(sa); //close connection
     }
 }
