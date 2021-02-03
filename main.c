@@ -27,8 +27,15 @@ char* parse_http_request(char* request){
     key = strtok(temp, " ");
     key = strtok(NULL, " ");
 
-    //key[sizeof(key)] = '\0';
-    return key;
+    char *ret = (char*)malloc(sizeof(key)-1);
+
+    for (int i = 0; i < strlen(key); i++)
+    {
+        ret[i] = key[i+1];  
+    }
+
+    //ret[sizeof(ret)] = '\0';
+    return ret;
 }
 
 int main(int argc, char *argv[])
