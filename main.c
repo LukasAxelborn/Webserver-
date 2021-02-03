@@ -20,7 +20,7 @@ void fatal(char *string)
 
 int main(int argc, char *argv[])
 {
-    int s, b, l, fd, sa, bytes, on = 1;
+    int s, b, l, sa, on = 1;
     char buf[BUF_SIZE];         /* buffer for outging file */
     struct sockaddr_in channel; /* holds IP address */
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
         /* meanwhile the socket is still listening */
         if (sa < 0)
             fatal("accept failed");
-        
+
         char buff[100];
         snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
         write(sa, (char *)buff, strlen((char *)buff));
