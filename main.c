@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-    int s, b, l, sa, bytes, on = 1;
+    int s, b, l, fd, sa, bytes, on = 1;
     char buf[BUF_SIZE];         /* buffer for outging file */
     struct sockaddr_in channel; /* holds IP address */
 
