@@ -61,8 +61,11 @@ int main(int argc, char *argv[])
             fatal("accept failed");
 
         char buff[100];
-        snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
+        snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
         write(sa, (char *)buff, strlen((char *)buff));
+
+        printf("Buff: %s\n", buff);
+
 
         close(sa); //close connection
     }
