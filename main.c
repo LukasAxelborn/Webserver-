@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
     {
         printf("wating for connection on port %d\n", SERVER_PORT);
         fflush(stdout);
+
         sa = accept(s, 0, 0); //block for connection request, last 2 arg is to get address of whoever connected
         /* sa will be used to interact with the connected client */
         /* meanwhile the socket is still listening */
@@ -63,9 +64,6 @@ int main(int argc, char *argv[])
         snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
         write(sa, (char *)buff, strlen((char *)buff));
 
-        read(sa, buf, BUF_SIZE); //read file name from socket
-
-        close(fd); //close file
         close(sa); //close connection
     }
 }
