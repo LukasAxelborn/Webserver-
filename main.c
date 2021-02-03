@@ -1,12 +1,21 @@
 #include <stdio.h> /* This is the server code*/
+#include <string.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <stdlib.h>
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree */
 #define BUF_SIZE 4096     /* block transfer size */
 #define QUEUE_SIZE 10
+
+void fatal(char * string)
+{
+    printf("%s\n", string);
+    exit(1);
+}
 
 int main(int argc, char *argv[])
 {
@@ -27,7 +36,7 @@ int main(int argc, char *argv[])
         fatal("socket failed");
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
 
-    b = bind(s, (struct socketaddr *)&channel, sizeof(channel));
+    b = bind(s, (struct sockaddr*)&channel, sizeof(channel));
     if (b < 0)
         fatal("bind failed");
 
@@ -59,3 +68,4 @@ int main(int argc, char *argv[])
         close(fd); //close file
         close(sa); //close connection
     }
+}
