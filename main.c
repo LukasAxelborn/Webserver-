@@ -65,19 +65,6 @@ int main(int argc, char *argv[])
 
         read(sa, buf, BUF_SIZE); //read file name from socket
 
-        /* get and return the file */
-        fd = open(buf, O_RDONLY); //open the file to be sent back
-        printf("buf: %s\n", buf);
-        if (fd < 0)
-            fatal("open failed");
-
-        while (1)
-        {
-            bytes = read(fd, buf, BUF_SIZE); //read from file
-            if (bytes <= 0)
-                break;             //check for eof
-            write(sa, buf, bytes); //write bytes to socket
-        }
         close(fd); //close file
         close(sa); //close connection
     }
