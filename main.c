@@ -1,5 +1,6 @@
 #include <stdio.h> /* This is the server code*/
 #include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/socket.h>
