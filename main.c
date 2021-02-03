@@ -8,7 +8,7 @@
 #include <netdb.h>
 #include <stdlib.h>
 
-#define SERVER_PORT 12345 /* arbitary, but client & server must agree */
+#define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
 #define BUF_SIZE 4096     /* block transfer size */
 #define QUEUE_SIZE 10
 
@@ -32,11 +32,13 @@ int main(int argc, char *argv[])
 
     /* Passive open. Wait for connection */
 
+    /* create socket */
     s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (s < 0)
         fatal("socket failed");
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
 
+    /* bind and listen */
     b = bind(s, (struct sockaddr*)&channel, sizeof(channel));
     if (b < 0)
         fatal("bind failed");
@@ -46,9 +48,13 @@ int main(int argc, char *argv[])
         fatal("listen failed");
 
     /* socket is now set up and bound. Wait for connection and process it */
+    /* inf loop that accepts and handles connections */
     while (1)
     {
-        sa = accept(s, 0, 0); //block for connection request
+        printf("wating for connection on port %d\n", SERVER_PORT);
+        sa = accept(s, 0, 0); //block for connection request, last 2 arg is to get address of whoever connected
+        /* sa will be used to interact with the connected client */
+        /* meanwhile the socket is still listening */
         if (sa < 0)
             fatal("accept failed");
 
