@@ -25,6 +25,31 @@ int main(int argc, char * argv[]){
 	if(s < 0) fatal("socket failed");
 	setsockopt(s, SOL_SOCKET, SO_REUSEADDER, (char *)&on,sizeof(on));
 
+  b = bind(s, (struct socketaddr *) &channel, sizeof(channel));
+  if(b < 0) fatal("bind failed");
 
+  l = listen(s, QUEUE_SIZE);              //specify queue size
+  if(l < 0) fatal("listen failed");
 
-//test
+  /* socket is now set up and bound. Wait for connection and process it */
+  while(1)
+  {
+      sa = accept(s, 0, 0);               //block for connection request
+      if(sa < 0) fatal("accept failed");
+
+      read(sa, buf, BUF_SIZE);            //read file name from socket
+
+      /* get and return the file */
+      fd = open(buf, O_RDONLY);           //open the file to be sent back
+      if(fd < 0) fatal("open failed");
+
+      while(1)
+      {
+          bytes = read(fd, buf, BUF_SIZE);    //read from file
+          if(bytes <= 0) break;               //check for eof
+          write(sa, buf, bytes);              //write bytes to socket
+      }
+      close(fd);                              //close file
+      close(sa);                              //close connection
+  }
+
