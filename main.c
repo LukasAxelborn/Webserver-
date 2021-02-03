@@ -18,10 +18,23 @@ void fatal(char *string)
     exit(1);
 }
 
+char* parse_http_request(char* request){
+
+    char *key;
+    char temp[strlen(request)];
+
+    strcpy(temp, request);
+    key = strtok(temp, " ");
+    key = strtok(NULL, " ");
+
+    //key[sizeof(key)] = '\0';
+    return key;
+}
+
 int main(int argc, char *argv[])
 {
     int s, b, l, sa, on = 1;
-    char buf[BUF_SIZE];         /* buffer for outging file */
+    char buf[BUF_SIZE], tmp[BUF_SIZE];         /* buffer for outging file */
     struct sockaddr_in channel; /* holds IP address */
 
     /* Build address structure to bind to socket */
@@ -59,12 +72,20 @@ int main(int argc, char *argv[])
         /* meanwhile the socket is still listening */
         if (sa < 0)
             fatal("accept failed");
+        
+        memset(buf, 0, BUF_SIZE);
+        read(sa, buf, BUF_SIZE); //read file name from socket
+
+
+        // funktionen retunerar en sträng om addrese till filen den vill läsa      
+        parse_http_request(buf);
+        printf("\n\n\n\n\n %s \n\n\n\n\n", parse_http_request(buf));
 
         char buff[100];
         snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
         write(sa, (char *)buff, strlen((char *)buff));
 
-        printf("Buff: %s\n", buff);
+        printf("%s", buf);
 
 
         close(sa); //close connection
