@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <sys/sendfile.h>
-
 #include <arpa/inet.h>
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
@@ -111,10 +110,10 @@ void server()
         //snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
         //write(sa, (char *)buff, strlen((char *)buff));
 
-        if(!strncmp(buf, "GET /f1.jpg", 16))
+        if(!strncmp(buf, "GET /f1.jpg", 11))
         {
             fd = open("f1.jpg", O_RDONLY); //open the file to be sent back
-            sendfile(sa, fd, NULL, 221115);
+            sendfile(sa, fd, NULL, 250000);
             close(fd);
         }
 
