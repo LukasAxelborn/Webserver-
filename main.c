@@ -8,6 +8,8 @@
 #include <netdb.h>
 #include <stdlib.h>
 
+#include <arpa/inet.h>
+
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
 #define BUF_SIZE 4096     /* block transfer size */
 #define QUEUE_SIZE 10
@@ -18,7 +20,8 @@ void fatal(char *string)
     exit(1);
 }
 
-char* parse_http_request(char* request){
+char *parse_http_request(char *request)
+{
 
     char *key;
     char temp[strlen(request)];
@@ -27,22 +30,37 @@ char* parse_http_request(char* request){
     key = strtok(temp, " ");
     key = strtok(NULL, " ");
 
-    char *ret = (char*)malloc(sizeof(key)-1);
+    char *ret = (char *)calloc(sizeof(char), strlen(key) - 1);
 
     for (int i = 0; i < strlen(key); i++)
     {
-        ret[i] = key[i+1];  
+        ret[i] = key[i + 1];
     }
 
     //ret[sizeof(ret)] = '\0';
     return ret;
 }
 
+char page[] =
+
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html: charset=UTF-8\r\n\r\n"
+    "<!DOCTYPE html>\r\n"
+    "<html><head><title>Cool-website</titel>\r\n"
+    "<style>body {background-color: #FFFF00}</style></head>\r\n"
+    "<img src=\"f1.jpg\"></center></body></html>\r\n";
+
+char *standardpagde()
+{
+
+    return page;
+}
+
 void server()
 {
-    int s, b, l, sa, on = 1;
-    char buf[BUF_SIZE], tmp[BUF_SIZE];         /* buffer for outging file */
-    struct sockaddr_in channel; /* holds IP address */
+    int s, b, l, sa, fd, on = 1;
+    char buf[BUF_SIZE], tmp[BUF_SIZE]; /* buffer for outging file */
+    struct sockaddr_in channel;        /* holds IP address */
 
     /* Build address structure to bind to socket */
     memset(&channel, 0, sizeof(channel));
@@ -80,23 +98,25 @@ void server()
         if (sa < 0)
             fatal("accept failed");
 
-        printf("got client connection\n");
-        fflush(stdout);
-        
+     
         memset(buf, 0, BUF_SIZE);
         read(sa, buf, BUF_SIZE); //read file name from socket
 
-
-        // funktionen retunerar en sträng om addrese till filen den vill läsa      
+        // funktionen retunerar en sträng om addrese till filen den vill läsa
         parse_http_request(buf);
         printf("\n\n\n\n\n %s \n\n\n\n\n", parse_http_request(buf));
 
-        char buff[100];
-        snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
-        write(sa, (char *)buff, strlen((char *)buff));
+        //char buff[100];
+        //snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
+        //write(sa, (char *)buff, strlen((char *)buff));
+
+        fd = open("f1.jpg", O_RDONLY); //open the file to be sent back
+        //sendfile(sa, fd, NULL, 221115);
+        close(fd);
+
+        write(sa, page, sizeof(page));
 
         printf("%s", buf);
-
 
         close(sa); //close connection
     }
