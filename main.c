@@ -48,7 +48,7 @@ char page[] =
     "Content-Type: text/html; charset=UTF-8\r\n\r\n"
     "<!DOCTYPE html>\r\n"
     "<html><head><title>Cool-website</title>\r\n"
-    "<style>body { background-color: #FFFF00 }</style></head>\r\n"
+    "<style>body { background-color: #00ff00 }</style></head>\r\n"
     "<img src=\"f1.jpg\"></center></body></html>\r\n";
 
 char *standardpagde()
