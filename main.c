@@ -98,6 +98,7 @@ void server()
         if (sa < 0)
             fatal("accept failed");
 
+     
         memset(buf, 0, BUF_SIZE);
         read(sa, buf, BUF_SIZE); //read file name from socket
 
