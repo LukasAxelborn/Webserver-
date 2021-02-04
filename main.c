@@ -6,7 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <sys/stat.h>
 #include <stdlib.h>
+#include <sys/sendfile.h>
 
 #include <arpa/inet.h>
 
@@ -98,7 +100,6 @@ void server()
         if (sa < 0)
             fatal("accept failed");
 
-     
         memset(buf, 0, BUF_SIZE);
         read(sa, buf, BUF_SIZE); //read file name from socket
 
@@ -111,7 +112,7 @@ void server()
         //write(sa, (char *)buff, strlen((char *)buff));
 
         fd = open("f1.jpg", O_RDONLY); //open the file to be sent back
-        //sendfile(sa, fd, NULL, 221115);
+        sendfile(sa, fd, NULL, 221115);
         close(fd);
 
         write(sa, page, sizeof(page) - 1);
