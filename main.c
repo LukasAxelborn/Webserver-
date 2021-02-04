@@ -38,7 +38,7 @@ char* parse_http_request(char* request){
     return ret;
 }
 
-int main(int argc, char *argv[])
+void server()
 {
     int s, b, l, sa, on = 1;
     char buf[BUF_SIZE], tmp[BUF_SIZE];         /* buffer for outging file */
@@ -97,4 +97,9 @@ int main(int argc, char *argv[])
 
         close(sa); //close connection
     }
+}
+
+int main(int argc, char *argv[])
+{
+    server();
 }
