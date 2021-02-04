@@ -48,14 +48,9 @@ char page[] =
     "Content-Type: text/html; charset=UTF-8\r\n\r\n"
     "<!DOCTYPE html>\r\n"
     "<html><head><title>Cool-website</title>\r\n"
-    "<style>body { background-color: #00ff00 }</style></head>\r\n"
-    "<img src=\"f1.jpg\"></center></body></html>\r\n";
-
-char *standardpagde()
-{
-
-    return page;
-}
+    "<style>body { background-color: #fc5e03 }</style></head>\r\n"
+    "<body><center><h1>Time to party!</h1><br>\r\n"
+    "<img src=\"hallelu.gif\"></center></body></html>\r\n";
 
 void server()
 {
@@ -109,16 +104,23 @@ void server()
         //char buff[100];
         //snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
         //write(sa, (char *)buff, strlen((char *)buff));
-
-        if(!strncmp(buf, "GET /f1.jpg", 11))
+        if(!strncmp(buf, "GET /myindex.ico", 16))
         {
-            fd = open("f1.jpg", O_RDONLY); //open the file to be sent back
+            fd = open("myindex.ico", O_RDONLY); //open the file to be sent back
+            sendfile(sa, fd, NULL, 5000);
+            close(fd);
+        }
+        else if(!strncmp(buf, "GET /hallelu.gif", 11))
+        {
+            fd = open("hallelu.gif", O_RDONLY); //open the file to be sent back
             sendfile(sa, fd, NULL, 250000);
             close(fd);
         }
-
-        write(sa, page, sizeof(page) - 1);
-
+        else
+        {
+            write(sa, page, sizeof(page) - 1);
+        }
+        
         printf("%s", buf);
 
         close(sa); //close connection
