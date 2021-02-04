@@ -49,7 +49,7 @@ char page[] =
     "Content-Type: text/html; charset=UTF-8\r\n\r\n"
     "<!DOCTYPE html>\r\n"
     "<html><head><title>Cool-website</title>\r\n"
-    "<style>body { background-color: #FFFF00 }</style></head>\r\n"
+    "<style>body { background-color: #00ff00 }</style></head>\r\n"
     "<img src=\"f1.jpg\"></center></body></html>\r\n";
 
 char *standardpagde()
@@ -111,10 +111,10 @@ void server()
         //snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
         //write(sa, (char *)buff, strlen((char *)buff));
 
-        if(!strncmp(buf, "GET /f1.jpg", 16))
+        if (!strncmp(buf, "GET /f1.jpg", 16))
         {
             fd = open("f1.jpg", O_RDONLY); //open the file to be sent back
-            sendfile(sa, fd, NULL, 221115);
+            sendfile(sa, fd, NULL, 211115);
             close(fd);
         }
 
