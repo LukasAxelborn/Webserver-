@@ -114,7 +114,7 @@ void server()
         //sendfile(sa, fd, NULL, 221115);
         close(fd);
 
-        write(sa, page, sizeof(page));
+        write(sa, page, sizeof(page) - 1);
 
         printf("%s", buf);
 
