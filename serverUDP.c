@@ -17,14 +17,14 @@
 
 int main(int argc, char *argv[])
 {
-    int socketfd;
+    int sockfd;
     struct sockaddr_in server, client; /* holds IP address */
     char buf[BUF_SIZE];                /* buffer for outging file */
     socklen_t addr_size;
 
     /* create socket */
 
-    socketfd = socket(AF_INET, SOCK_DGRAM, 0);
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     /* Build address structure to bind to socket */
     memset(&server, 0, sizeof(server));
@@ -35,18 +35,21 @@ int main(int argc, char *argv[])
     /* Passive open. Wait for connection */
 
     /* bind and listen */
-    bind(socketfd, (struct sockaddr *)&server, sizeof(server));
+    bind(sockfd, (struct sockaddr *)&server, sizeof(server));
 
     addr_size = sizeof(client);
 
-    recvfrom(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &addr_size);
+    recvfrom(sockfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &addr_size);
     
     printf("[+]Data received: %s\n", buf);
 
     time_t servertime;
     time(&servertime);
     sprintf(buf, "%ld", servertime);
-    sendto(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, addr_size);
+    sendto(sockfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, addr_size);
     
     printf("[+]Data received: %ld\n", servertime);
+
+    close(sockfd);
+
 }

@@ -38,8 +38,9 @@ int main(int argc, char **argv)
     addr_size = sizeof(serverAddr);
 
     recvfrom(sockfd, buffer, BUF_SIZE, 0, (struct sockaddr*)&serverAddr, &addr_size);
-    printf("buf = %s\n", buffer);
-    time_t servertime = strtol(buffer, NULL, BUF_SIZE);
-    printf("time = %ld\n", strtol(buffer, NULL, BUF_SIZE));
+    time_t servertime = (long)atoi(buffer);
     printf("[+]Data received: %s\n", ctime(&servertime));
+
+    close(sockfd);
+
 }
