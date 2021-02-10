@@ -1,4 +1,5 @@
 #include <stdio.h> /* This is the server code*/
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -7,9 +8,6 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <sys/stat.h>
-#include <stdlib.h>
-#include <sys/sendfile.h>
-#include <arpa/inet.h>
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
 #define BUF_SIZE 4096     /* block transfer size */
@@ -52,9 +50,26 @@ char page[] =
     "<body><center><h1>Time to party!</h1><br>\r\n"
     "<img src=\"my-server.jpg\"></center></body></html>\r\n";
 
-void test(int sa)
+void send_file(int sa, int fd)
 {
-    write(sa, page, sizeof(page) - 1);
+    int bytes;
+    char buf[BUF_SIZE];
+    while (1)
+    {
+        printf("line: %d\n", __LINE__);
+        bytes = read(fd, buf, BUF_SIZE);
+        if (bytes <= 0)
+            break;
+
+        write(sa, buf, bytes);
+    }
+}
+
+int get_file_size(int fd)
+{
+    struct stat buf;
+    fstat(fd, &buf);
+    return buf.st_size;
 }
 
 void server()
@@ -106,11 +121,7 @@ void server()
         char *get = parse_http_request(buf);
         printf("\n\n\n\n\n %s \n\n\n\n\n", parse_http_request(buf));
 
-        //char buff[100];
-        //snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
-        //write(sa, (char *)buff, strlen((char *)buff));
-
-        if (!strncmp(get, "my-server.jpg", 13))
+        if (!strcmp(get, "my-server.jpg"))
         {
             printf("line: %d\n", __LINE__);
 
@@ -118,23 +129,15 @@ void server()
             if (fd < 0)
                 fatal("open the file failed");
 
+            int size = get_file_size(fd);
+
             char pickture[] = "HTTP/1.1 200 OK\r\n"
                               "Content-Type: image/jpg\r\n"
                               "Content-Length: 104415\r\n\r\n";
 
             write(sa, pickture, sizeof(pickture) - 1);
 
-            char buffer[BUF_SIZE];
-
-            while (1)
-            {
-                printf("line: %d\n", __LINE__);
-                bytes = read(fd, buffer, BUF_SIZE);
-                if (bytes <= 0)
-                    break;
-
-                write(sa, buffer, bytes);
-            }
+            send_file(sa, fd); // Send the image to the server
 
             close(fd);
         }
@@ -144,8 +147,6 @@ void server()
 
             write(sa, page, sizeof(page) - 1);
         }
-
-        //sendfile(sa, fd, NULL, 211115);
 
         printf("line: %d\n", __LINE__);
         //test(sa);
