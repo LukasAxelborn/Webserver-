@@ -20,36 +20,32 @@ void fatal(char *string)
 
 int main(int argc, char *argv[])
 {
-    int s, b, l, sa, on = 1;
-    char buf[BUF_SIZE], tmp[BUF_SIZE]; /* buffer for outging file */
+    int socketfd;
     struct sockaddr_in server, client; /* holds IP address */
-    socklen_t client_size;
+    char buf[BUF_SIZE];                /* buffer for outging file */
+    socklen_t addr_size;
 
     /* create socket */
 
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    if (s < 0)
-        fatal("socket failed");
+    socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
     /* Build address structure to bind to socket */
     memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = htonl(INADDR_ANY);
     server.sin_port = htons(SERVER_PORT);
+    server.sin_addr.s_addr = INADDR_ANY;
 
     /* Passive open. Wait for connection */
 
     //setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
 
     /* bind and listen */
-    b = bind(s, (struct sockaddr *)&server, sizeof(server));
-    if (b < 0)
-        fatal("bind failed");
+    bind(socketfd, (struct sockaddr *)&server, sizeof(server));
 
-    client_size = sizeof(client);
+    addr_size = sizeof(client);
 
-    recvfrom(s, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &client_size);
+    recvfrom(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &addr_size);
     printf("[+]Data received: %s", buf);
-    sendto(s, buf, BUF_SIZE, 0, (struct sockaddr *)&client, client_size);
+    sendto(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, addr_size);
     printf("[+]Data received: %s", buf);
 }
