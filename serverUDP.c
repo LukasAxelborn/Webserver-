@@ -8,6 +8,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#include <time.h>
+
+
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
 #define BUF_SIZE 1024     /* block transfer size */
 
@@ -31,8 +34,6 @@ int main(int argc, char *argv[])
 
     /* Passive open. Wait for connection */
 
-    //setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
-
     /* bind and listen */
     bind(socketfd, (struct sockaddr *)&server, sizeof(server));
 
@@ -40,9 +41,12 @@ int main(int argc, char *argv[])
 
     recvfrom(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &addr_size);
     
-    printf("[+]Data received: %s", buf);
+    printf("[+]Data received: %s\n", buf);
 
+    time_t servertime;
+    time(&servertime);
+    sprintf(buf, "%ld", servertime);
     sendto(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, addr_size);
     
-    printf("[+]Data received: %s", buf);
+    printf("[+]Data received: %ld\n", servertime);
 }
