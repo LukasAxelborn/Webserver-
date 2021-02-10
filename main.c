@@ -50,6 +50,15 @@ char page[] =
     "<body><center><h1>Time to party!</h1><br>\r\n"
     "<img src=\"my-server.jpg\"></center></body></html>\r\n";
 
+char error[] =
+
+    "HTTP/1.1 404 Not Found\r\n"
+    "Content-Type: text/html; charset=UTF-8; \r\n\r\n"
+    "<!DOCTYPE html>\r\n"
+    "<html><head><title>404 Not Found</title>\r\n"
+    "<style>body { background-color: #fc5e03 }</style></head>\r\n"
+    "<body><h1>404 File not found</h1><br>\r\n";
+
 void send_file(int sa, int fd)
 {
     int bytes;
@@ -119,7 +128,6 @@ void server()
 
         // funktionen retunerar en sträng om addrese till filen den vill läsa
         char *get = parse_http_request(buf);
-        printf("\n\n\n\n\n %s \n\n\n\n\n", parse_http_request(buf));
 
         if (!strcmp(get, "my-server.jpg"))
         {
@@ -127,26 +135,32 @@ void server()
 
             fd = open("my-server.jpg", O_RDONLY); //open the file to be sent back
             if (fd < 0)
+            {
                 fatal("open the file failed");
-
+            }
             int size = get_file_size(fd);
 
-            char pickture[] = "HTTP/1.1 200 OK\r\n"
+            char picture[] = "HTTP/1.1 200 OK\r\n"
                               "Content-Type: image/jpg\r\n"
                               "Content-Length: 104415\r\n\r\n";
 
-            write(sa, pickture, sizeof(pickture) - 1);
+            write(sa, picture, sizeof(picture) - 1);
 
             send_file(sa, fd); // Send the image to the server
 
             close(fd);
         }
-        else
+        else if(!strcmp(get, ""))
         {
             printf("line: %d\n", __LINE__);
 
             write(sa, page, sizeof(page) - 1);
         }
+        else
+        {
+            write(sa, error, sizeof(error) - 1);
+        }
+        
 
         printf("line: %d\n", __LINE__);
         //test(sa);
