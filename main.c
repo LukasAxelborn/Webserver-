@@ -33,7 +33,7 @@ char *parse_http_request(char *request)
 
     char *ret = (char *)calloc(sizeof(char), strlen(key) - 1);
 
-    for (int i = 0; i < strlen(key); i++)
+    for (int i = 0; i < strlen(key) - 1; i++)
     {
         ret[i] = key[i + 1];
     }
@@ -45,16 +45,21 @@ char *parse_http_request(char *request)
 char page[] =
 
     "HTTP/1.1 200 OK\r\n"
-    "Content-Type: text/html; charset=UTF-8\r\n\r\n"
+    "Content-Type: text/html; charset=UTF-8; \r\n\r\n"
     "<!DOCTYPE html>\r\n"
     "<html><head><title>Cool-website</title>\r\n"
     "<style>body { background-color: #fc5e03 }</style></head>\r\n"
     "<body><center><h1>Time to party!</h1><br>\r\n"
-    "<img src=\"hallelu.gif\"></center></body></html>\r\n";
+    "<img src=\"my-server.jpg\"></center></body></html>\r\n";
+
+void test(int sa)
+{
+    write(sa, page, sizeof(page) - 1);
+}
 
 void server()
 {
-    int s, b, l, sa, fd, on = 1;
+    int s, b, l, sa, fd, bytes, on = 1;
     char buf[BUF_SIZE], tmp[BUF_SIZE]; /* buffer for outging file */
     struct sockaddr_in channel;        /* holds IP address */
 
@@ -98,29 +103,53 @@ void server()
         read(sa, buf, BUF_SIZE); //read file name from socket
 
         // funktionen retunerar en sträng om addrese till filen den vill läsa
-        parse_http_request(buf);
+        char *get = parse_http_request(buf);
         printf("\n\n\n\n\n %s \n\n\n\n\n", parse_http_request(buf));
 
         //char buff[100];
         //snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nLukas Invest AB");
         //write(sa, (char *)buff, strlen((char *)buff));
-        if(!strncmp(buf, "GET /myindex.ico", 16))
+
+        if (!strncmp(get, "my-server.jpg", 13))
         {
-            fd = open("myindex.ico", O_RDONLY); //open the file to be sent back
-            sendfile(sa, fd, NULL, 5000);
-            close(fd);
-        }
-        else if(!strncmp(buf, "GET /hallelu.gif", 11))
-        {
-            fd = open("hallelu.gif", O_RDONLY); //open the file to be sent back
-            sendfile(sa, fd, NULL, 250000);
+            printf("line: %d\n", __LINE__);
+
+            fd = open("my-server.jpg", O_RDONLY); //open the file to be sent back
+            if (fd < 0)
+                fatal("open the file failed");
+
+            char pickture[] = "HTTP/1.1 200 OK\r\n"
+                              "Content-Type: image/jpg\r\n"
+                              "Content-Length: 104415\r\n\r\n";
+
+            write(sa, pickture, sizeof(pickture) - 1);
+
+            char buffer[BUF_SIZE];
+
+            while (1)
+            {
+                printf("line: %d\n", __LINE__);
+                bytes = read(fd, buffer, BUF_SIZE);
+                if (bytes <= 0)
+                    break;
+
+                write(sa, buffer, bytes);
+            }
+
             close(fd);
         }
         else
         {
+            printf("line: %d\n", __LINE__);
+
             write(sa, page, sizeof(page) - 1);
         }
-        
+
+        //sendfile(sa, fd, NULL, 211115);
+
+        printf("line: %d\n", __LINE__);
+        //test(sa);
+
         printf("%s", buf);
 
         close(sa); //close connection
