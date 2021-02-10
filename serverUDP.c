@@ -10,13 +10,7 @@
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
 #define BUF_SIZE 1024     /* block transfer size */
-#define QUEUE_SIZE 10
 
-void fatal(char *string)
-{
-    printf("%s\n", string);
-    exit(1);
-}
 
 int main(int argc, char *argv[])
 {
@@ -27,7 +21,7 @@ int main(int argc, char *argv[])
 
     /* create socket */
 
-    socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     /* Build address structure to bind to socket */
     memset(&server, 0, sizeof(server));
@@ -45,7 +39,10 @@ int main(int argc, char *argv[])
     addr_size = sizeof(client);
 
     recvfrom(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &addr_size);
+    
     printf("[+]Data received: %s", buf);
+
     sendto(socketfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, addr_size);
+    
     printf("[+]Data received: %s", buf);
 }
