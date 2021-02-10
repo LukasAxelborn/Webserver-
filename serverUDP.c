@@ -45,5 +45,4 @@ int main(int argc, char *argv[])
     printf("[+]Data received: %s", buf);
     sendto(s, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &client_size);
     printf("[+]Data received: %s", buf);
-    fsdjfn
 }
