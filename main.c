@@ -21,7 +21,6 @@ void fatal(char *string)
 
 char *parse_http_request(char *request)
 {
-
     char *key;
     char temp[strlen(request)];
 
