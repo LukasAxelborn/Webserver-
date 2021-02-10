@@ -65,7 +65,6 @@ void send_file(int sa, int fd)
     char buf[BUF_SIZE];
     while (1)
     {
-        printf("line: %d\n", __LINE__);
         bytes = read(fd, buf, BUF_SIZE);
         if (bytes <= 0)
             break;
@@ -81,7 +80,7 @@ int get_file_size(int fd)
     return buf.st_size;
 }
 
-void server()
+int main(int argc, char *argv[])
 {
     int s, b, l, sa, fd, bytes, on = 1;
     char buf[BUF_SIZE], tmp[BUF_SIZE]; /* buffer for outging file */
@@ -131,9 +130,8 @@ void server()
 
         if (!strcmp(get, "my-server.jpg"))
         {
-            printf("line: %d\n", __LINE__);
 
-            fd = open("my-server.jpg", O_RDONLY); //open the file to be sent back
+            fd = open(get, O_RDONLY); //open the file to be sent back
             if (fd < 0)
             {
                 fatal("open the file failed");
@@ -141,8 +139,8 @@ void server()
             int size = get_file_size(fd);
 
             char picture[] = "HTTP/1.1 200 OK\r\n"
-                              "Content-Type: image/jpg\r\n"
-                              "Content-Length: 104415\r\n\r\n";
+                             "Content-Type: image/jpg\r\n"
+                             "Content-Length: 104415\r\n\r\n";
 
             write(sa, picture, sizeof(picture) - 1);
 
@@ -150,28 +148,17 @@ void server()
 
             close(fd);
         }
-        else if(!strcmp(get, ""))
+        else if (!strcmp(get, ""))
         {
-            printf("line: %d\n", __LINE__);
-
             write(sa, page, sizeof(page) - 1);
         }
         else
         {
             write(sa, error, sizeof(error) - 1);
         }
-        
-
-        printf("line: %d\n", __LINE__);
-        //test(sa);
-
         printf("%s", buf);
 
+        free(get);
         close(sa); //close connection
     }
-}
-
-int main(int argc, char *argv[])
-{
-    server();
 }
