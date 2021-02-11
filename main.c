@@ -38,16 +38,6 @@ char *parse_http_request(char *request)
     return ret;
 }
 
-
-char error[] =
-
-    "HTTP/1.1 404 Not Found\r\n"
-    "Content-Type: text/html; charset=UTF-8; \r\n\r\n"
-    "<!DOCTYPE html>\r\n"
-    "<html><head><title>404 Not Found</title>\r\n"
-    "<style>body { background-color: #fc5e03 }</style></head>\r\n"
-    "<body><h1>404 File not found</h1><br>\r\n";
-
 void send_file(int sa, int fd)
 {
     int bytes;
@@ -115,9 +105,6 @@ int main(int argc, char *argv[])
 
         // funktionen retunerar en sträng om addrese till filen den vill läsa
         char *get = parse_http_request(buf);
-
-        printf("\n\n\n\n\nGET =|%s|\n\n\n\n\n\n", get);
-
 
         if (!strcmp(get, " HTTP"))
         {
