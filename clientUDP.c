@@ -9,32 +9,38 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-int main(int argc, char *argv[])
-{
-    if(argc != 2)
-    {
-        printf("Usage: %s <port>", argv[0]);
-        exit(0);
-    }
+#include <time.h>
 
-    int port = atoi(argv[1]);
+
+#define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
+#define BUF_SIZE 1024     /* block transfer size */
+
+int main(int argc, char **argv)
+{
+
+
     int sockfd;
     struct sockaddr_in serverAddr;
-    char buffer [1024];
+    char buffer [BUF_SIZE];
     socklen_t addr_size;
 
     sockfd = socket(PF_INET, SOCK_DGRAM, 0);
 
     memset(&serverAddr, '\0', sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(port);
+    serverAddr.sin_port = htons(SERVER_PORT);
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
-    strcpy(buffer, "Hello Server\n");
-    sendto(sockfd, buffer, 1024, 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
-    printf("[+]Data send: %s", buffer);
+    strcpy(buffer, "");
+    sendto(sockfd, buffer, BUF_SIZE, 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    printf("[+]Data send: %s\n", buffer);
 
     addr_size = sizeof(serverAddr);
-    recvfrom(sockfd, buffer, 1024, 0, (struct sockaddr*)&serverAddr, &addr_size);
-    printf("[+]Data received: %s", buffer);
+
+    recvfrom(sockfd, buffer, BUF_SIZE, 0, (struct sockaddr*)&serverAddr, &addr_size);
+    time_t servertime = (long)atoi(buffer);
+    printf("[+]Data received: %s\n", ctime(&servertime));
+
+    close(sockfd);
+
 }
