@@ -11,6 +11,7 @@
 #include <time.h>
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
+#define TIME 2208988800
 
 int main(int argc, char *argv[])
 {
@@ -41,11 +42,12 @@ int main(int argc, char *argv[])
 
     time_t servertime;
     time(&servertime);
-    uint32_t time = htonl((uint32_t)servertime);
+    //uint32_t time = htonl((uint32_t)(servertime + TIME ));
 
+    uint32_t time =servertime + TIME;
     sendto(sockfd, &time, sizeof(time), 0, (struct sockaddr *)&client, addr_size);
 
-    printf("[+]Data send: %ld\n", servertime);
+    printf("[+]Data send: %u\n", time);
 
     close(sockfd);
 }

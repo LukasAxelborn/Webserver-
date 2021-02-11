@@ -12,15 +12,15 @@
 #include <time.h>
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
-//#define BUF_SIZE 1024     /* block transfer size */
+#define TIME 2208988800
 
 int main(int argc, char **argv)
 {
 
     int sockfd;
     struct sockaddr_in serverAddr;
-    //char buffer [BUF_SIZE];
     uint32_t numbers;
+    time_t servertime;
     socklen_t addr_size;
 
     sockfd = socket(PF_INET, SOCK_DGRAM, 0);
@@ -35,10 +35,10 @@ int main(int argc, char **argv)
 
     addr_size = sizeof(serverAddr);
 
-    recvfrom(sockfd, &numbers, sizeof(uint32_t), 0, (struct sockaddr *)&serverAddr, &addr_size);
+    recvfrom(sockfd, &numbers, sizeof(numbers), 0, (struct sockaddr *)&serverAddr, &addr_size);
 
-    time_t servertime = ntohs(numbers);
-
+    //servertime = ntohs(numbers-TIME);
+    servertime = numbers-TIME;
     printf("size of numbers = %ld\n", sizeof(servertime));
 
     printf("[+]Data received: %s\n", ctime(&servertime));
