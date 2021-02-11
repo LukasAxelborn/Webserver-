@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     if(argc != 2)
     {
