@@ -21,34 +21,22 @@ void fatal(char *string)
 
 char *parse_http_request(char *request)
 {
-    char *key;
+  	char *key;
     char temp[strlen(request)];
 
     strcpy(temp, request);
     key = strtok(temp, " ");
-    key = strtok(NULL, " ");
+    key = strtok(NULL, "/%22");
 
     char *ret = (char *)calloc(sizeof(char), strlen(key) - 1);
 
-    for (int i = 0; i < strlen(key) - 1; i++)
+    for (int i = 0; i < strlen(key); i++)
     {
-        ret[i] = key[i + 1];
+        ret[i] = key[i];
     }
 
-    //ret[sizeof(ret)] = '\0';
     return ret;
 }
-
-char page[] =
-
-    "HTTP/1.1 200 OK\r\n"
-    "Content-Type: text/html; charset=UTF-8; \r\n\r\n"
-    "<!DOCTYPE html>\r\n"
-    "<html><head><title>Cool-website</title>\r\n"
-    "<style>body { background-color: #fc5e03 }</style></head>\r\n"
-    "<body><center><h1>Time to party!</h1><br>\r\n"
-    "<img src=\"my-server.jpg\" >\r\n"
-    "<img src=\"hallelu.gif\"></center></body></html>\r\n";
 
 
 char error[] =
@@ -116,7 +104,6 @@ int main(int argc, char *argv[])
     {
         printf("wating for connection on port %d\n", SERVER_PORT);
         fflush(stdout);
-
         sa = accept(s, 0, 0); //block for connection request, last 2 arg is to get address of whoever connected
         /* sa will be used to interact with the connected client */
         /* meanwhile the socket is still listening */
@@ -129,10 +116,24 @@ int main(int argc, char *argv[])
         // funktionen retunerar en sträng om addrese till filen den vill läsa
         char *get = parse_http_request(buf);
 
+        printf("\n\n\n\n\nGET =|%s|\n\n\n\n\n\n", get);
 
-        if (!strcmp(get, ""))
+
+        if (!strcmp(get, " HTTP"))
         {
-            write(sa, page, sizeof(page) - 1);
+            fd = open("index.html", O_RDONLY); //open the file to be sent back
+            if (fd < 0)
+            {
+                fatal("open the file failed");
+            }
+
+            char header[] = "HTTP/1.1 200 OK\r\n"
+                            "Content-Type: text/html; charset=UTF-8; \r\n\r\n";
+
+
+            write(sa, header, sizeof(header) - 1);
+            send_file(sa, fd);
+            close(fd);
         }
         else if (!strcmp(get, "my-server.jpg"))
         {
@@ -144,11 +145,11 @@ int main(int argc, char *argv[])
             }
             int size = get_file_size(fd);
 
-            char picture[] = "HTTP/1.1 200 OK\r\n"
+            char header[] = "HTTP/1.1 200 OK\r\n"
                              "Content-Type: image/jpg\r\n"
                              "Content-Length: 104415\r\n\r\n";
 
-            write(sa, picture, sizeof(picture) - 1);
+            write(sa, header, sizeof(header) - 1);
 
             send_file(sa, fd); // Send the image to the server
 
@@ -172,10 +173,41 @@ int main(int argc, char *argv[])
             send_file(sa, fd); // Send the image to the server
 
             close(fd);
+        } 
+        else if (!strcmp(get, "hund.jpg"))
+        {
+            fd = open(get, O_RDONLY); //open the file to be sent back
+            if (fd < 0)
+            {
+                fatal("open the file failed");
+            }
+            int size = get_file_size(fd);
+
+            char picture[] = "HTTP/1.1 200 OK\r\n"
+                             "Content-Type: image/jpg\r\n"
+                             "Content-Length: 360319\r\n\r\n";
+
+            write(sa, picture, sizeof(picture) - 1);
+
+            send_file(sa, fd); // Send the image to the server
+
+            close(fd);
         }
         else
         {
-            write(sa, error, sizeof(error) - 1);
+            fd = open("error.html", O_RDONLY); //open the file to be sent back
+            if (fd < 0)
+            {
+                fatal("open the file failed");
+            }
+
+            char header[] = "HTTP/1.1 404 Not Found\r\n"
+                            "Content-Type: text/html; charset=UTF-8; \r\n\r\n";
+
+
+            write(sa, header, sizeof(header) - 1);
+            send_file(sa, fd);
+            close(fd);
         }
 
         printf("%s", buf);
