@@ -47,7 +47,9 @@ char page[] =
     "<html><head><title>Cool-website</title>\r\n"
     "<style>body { background-color: #fc5e03 }</style></head>\r\n"
     "<body><center><h1>Time to party!</h1><br>\r\n"
-    "<img src=\"my-server.jpg\"></center></body></html>\r\n";
+    "<img src=\"my-server.jpg\" >\r\n"
+    "<img src=\"hallelu.gif\"></center></body></html>\r\n";
+
 
 char error[] =
 
@@ -127,7 +129,12 @@ int main(int argc, char *argv[])
         // funktionen retunerar en sträng om addrese till filen den vill läsa
         char *get = parse_http_request(buf);
 
-        if (!strcmp(get, "my-server.jpg"))
+
+        if (!strcmp(get, ""))
+        {
+            write(sa, page, sizeof(page) - 1);
+        }
+        else if (!strcmp(get, "my-server.jpg"))
         {
 
             fd = open(get, O_RDONLY); //open the file to be sent back
@@ -147,14 +154,30 @@ int main(int argc, char *argv[])
 
             close(fd);
         }
-        else if (!strcmp(get, ""))
+          else if (!strcmp(get, "hallelu.gif"))
         {
-            write(sa, page, sizeof(page) - 1);
+            fd = open(get, O_RDONLY); //open the file to be sent back
+            if (fd < 0)
+            {
+                fatal("open the file failed");
+            }
+            int size = get_file_size(fd);
+
+            char picture[] = "HTTP/1.1 200 OK\r\n"
+                             "Content-Type: image/gif\r\n"
+                             "Content-Length: 2434610\r\n\r\n";
+
+            write(sa, picture, sizeof(picture) - 1);
+
+            send_file(sa, fd); // Send the image to the server
+
+            close(fd);
         }
         else
         {
             write(sa, error, sizeof(error) - 1);
         }
+
         printf("%s", buf);
 
         free(get);

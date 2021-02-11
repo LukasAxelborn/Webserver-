@@ -12,14 +12,12 @@
 
 
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
-#define BUF_SIZE 1024     /* block transfer size */
 
 
 int main(int argc, char *argv[])
 {
     int sockfd;
     struct sockaddr_in server, client; /* holds IP address */
-    char buf[BUF_SIZE];                /* buffer for outging file */
     socklen_t addr_size;
 
     /* create socket */
@@ -39,16 +37,17 @@ int main(int argc, char *argv[])
 
     addr_size = sizeof(client);
 
-    recvfrom(sockfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, &addr_size);
+    recvfrom(sockfd, NULL, 0, 0, (struct sockaddr *)&client, &addr_size);
     
-    printf("[+]Data received: %s\n", buf);
+    printf("[+]Data received: %s\n", "nothing");
 
     time_t servertime;
     time(&servertime);
-    sprintf(buf, "%ld", servertime);
-    sendto(sockfd, buf, BUF_SIZE, 0, (struct sockaddr *)&client, addr_size);
-    
-    printf("[+]Data received: %ld\n", servertime);
+    uint32_t time = htonl(servertime);
+
+    sendto(sockfd, &time, sizeof(uint32_t), 0, (struct sockaddr *)&client, addr_size);
+
+    printf("[+]Data send: %ld\n", servertime);
 
     close(sockfd);
 
