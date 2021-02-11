@@ -11,13 +11,11 @@
 
 #include <time.h>
 
-
 #define SERVER_PORT 12345 /* arbitary, but client & server must agree, std is 80, though it may req super-user */
 //#define BUF_SIZE 1024     /* block transfer size */
 
 int main(int argc, char **argv)
 {
-
 
     int sockfd;
     struct sockaddr_in serverAddr;
@@ -32,17 +30,18 @@ int main(int argc, char **argv)
     serverAddr.sin_port = htons(SERVER_PORT);
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
-    sendto(sockfd, NULL, 0, 0, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    sendto(sockfd, NULL, 0, 0, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
     printf("[+]Data send: %s\n", "nothing");
 
     addr_size = sizeof(serverAddr);
 
-    recvfrom(sockfd, &numbers, sizeof(uint32_t), 0, (struct sockaddr*)&serverAddr, &addr_size);
-    
+    recvfrom(sockfd, &numbers, sizeof(uint32_t), 0, (struct sockaddr *)&serverAddr, &addr_size);
+
     time_t servertime = ntohs(numbers);
-    
+
+    printf("size of numbers = %ld\n", sizeof(servertime));
+
     printf("[+]Data received: %s\n", ctime(&servertime));
 
     close(sockfd);
-
 }
